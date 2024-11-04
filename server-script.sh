@@ -8,6 +8,7 @@ then
   cd addressbook-v1
   git pull origin ssh-agent
 else
+echo "--------------------clone git repo-----------------------------------------"
   git clone https://github.com/rushikesh-pardeshi/addressbook-v1.git
 fi
 
