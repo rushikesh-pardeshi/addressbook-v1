@@ -1,58 +1,87 @@
 pipeline {
-   agent none
-   tools{
-//     jdk "myjava"
-        maven "my_maven"
-   }
-   parameters{
-        string(name:'Env',defaultValue:'Test',description:'Environment to deploy')
+    agent none
+    tools {
+        maven 'my_maven' 
+    }
+    parameters{
+        string(name:'Env',defaultValue:'Test',description:'version to deploy')
         booleanParam(name:'executeTests',defaultValue: true,description:'decide to run tc')
         choice(name:'APPVERSION',choices:['1.1','1.2','1.3'])
 
-   }
+    }
+    environment{
+        DEV_SERVER='ec2-user@172.31.2.28'
+    }
     stages {
-        stage('Compile') { //prod
-        agent any
+        stage('Compile') {
+            agent any
             steps {
-                echo "Compile the code in ${params.Env}"
+                echo 'Compiling the code'
+                echo "compiling in env: ${params.Env}"
                 sh "mvn compile"
+
             }
         }
-         stage('UnitTest') { //test
-         when{
-            expression{
-                params.executeTests == true 
-            }
-         }
-         agent any
+         stage('CodeReview') {
+            agent any
             steps {
-                echo "Test the code"
+                echo 'Reviewing the code'
+                echo "Deploying the app version ${params.APPVERSION}"
+                sh "mvn pmd:pmd"
+            }
+            post{
+                always{
+                    pmd pattern: 'target/pmd.xml'
+                }
+            }
+        }
+         stage('UniTest') {
+           agent {label 'linux_slave1'}
+            when{
+                expression{
+                    params.executeTests == true
+                }
+            }
+            
+            steps {
+                echo 'UnitTest the code'
                 sh "mvn test"
             }
             post{
                 always{
-                     junit 'target/surefire-reports/*.xml'
+                    junit 'target/surefire-reports/*.xml'
                 }
             }
         }
-         stage('Package') {//dev
-        agent {label 'linux_slave1'}
-        // when{
-        //     expression{
-        //         BRANCH_NAME == 'b2'
-        //     }
-        // }
-        // agent any
-           input{
-            message "Select the version to deploy"
-            ok "version selected"
-            parameters{
-                choice(name:'NEWAPP',choices:['1.2','2.1','3.1'])
-            }
-           }
+
+         stage('Package') {
+            //agent {label 'linux_slave'}
+            agent any
             steps {
-                echo "Package the code ${params.APPVERSION}"
-                sh "mvn package"
+                script{
+                sshagent(['ssh-user3']) {
+                echo 'Package the code'
+                echo "Deploying the app version ${params.APPVERSION}"
+                // scp for copy script from jenkin server to new ssh agent
+                sh "scp -o StrictHostKeyChecking=no server-script.sh ${DEV_SERVER}:/home/ec2-user"
+                sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER} 'bash /home/ec2-user/server-script.sh'"
+            }
+        }
+            }
+         }
+          stage('Deploy') {
+            agent any
+            input{
+                message "Select the platform to deploy"
+                ok "Platform selected"
+                parameters{
+                    choice(name:'Platform',choices:['On-prem','EKS','EC2'])
+                }
+            }
+            steps {
+                echo 'Deploy the code'
+                echo "Deploying the app version ${params.APPVERSION}"
+                echo "Deploying on ${params.Platform}"
             }
         }
     }
