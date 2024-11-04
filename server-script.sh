@@ -9,10 +9,8 @@ then
   git pull origin ssh-agent
 else
   git clone https://github.com/rushikesh-pardeshi/addressbook-v1.git
-  cd addressbook-v1
-  git checkout ssh-agent
 fi
 
 
-
+cd addressbook-v1
 mvn package
