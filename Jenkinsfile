@@ -10,7 +10,7 @@ pipeline {
 
     }
     environment{
-        DEV_SERVER='ec2-user@172.31.2.28'
+        DEV_SERVER='ec2-user@172.31.8.125'
     }
     stages {
         stage('Compile') {
@@ -59,7 +59,7 @@ pipeline {
             agent any
             steps {
                 script{
-                sshagent(['ssh-user3']) {
+                sshagent(['ssh-agent-4']) {
                 echo 'Package the code'
                 echo "Deploying the app version ${params.APPVERSION}"
                 // scp for copy script from jenkin server to new ssh agent
