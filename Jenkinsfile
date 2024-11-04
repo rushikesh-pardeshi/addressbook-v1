@@ -2,7 +2,7 @@ pipeline {
    agent none
    tools{
 //     jdk "myjava"
-        maven "mymaven"
+        maven "my_maven"
    }
    parameters{
         string(name:'Env',defaultValue:'Test',description:'Environment to deploy')
