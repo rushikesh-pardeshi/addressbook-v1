@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.preethidevops.tutorial</groupId>
+    <groupId>rushi.devops</groupId>
     <artifactId>addressbook</artifactId>
     <packaging>war</packaging>
     <version>2.0</version>
@@ -491,5 +491,11 @@
             </reporting>
         </profile>
     </profiles>
-
+<distributionManagement>
+    <repository>
+        <id>central</id>
+        <name>a0o2ibl0kfu2c-artifactory-primary-0-releases</name>
+        <url>https://trialr30elw.jfrog.io/artifactory/jenkins_jfrong-libs-release</url>
+    </repository>
+</distributionManagement>
 </project>

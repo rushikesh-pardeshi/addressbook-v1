@@ -6,7 +6,7 @@ if [ -d "addressbook-v1" ]
 then
   echo "------------------repo is cloned and exists-----------------------------"
   cd addressbook-v1
-  git pull origin ssh-agent
+  git pull origin jfrong-jenkin
 else
   git clone https://github.com/rushikesh-pardeshi/addressbook-v1.git
 fi
@@ -14,3 +14,5 @@ fi
 
 cd addressbook-v1
 mvn package
+
+mvn -U deploy -s settings.xml
