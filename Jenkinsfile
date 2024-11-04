@@ -39,7 +39,7 @@ pipeline {
         // agent {label 'linux_slave'}
         when{
             expression{
-                BRANCH_NAME == 'agent'
+                BRANCH_NAME == 'b2'
             }
         }
         agent any
