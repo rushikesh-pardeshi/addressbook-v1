@@ -36,7 +36,7 @@ pipeline {
             }
         }
          stage('Package') {//dev
-        //agent {label 'linux_slave'}
+        // agent {label 'linux_slave'}
         when{
             expression{
                 BRANCH_NAME == 'agent'
