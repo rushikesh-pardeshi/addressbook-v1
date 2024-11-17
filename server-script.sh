@@ -12,7 +12,8 @@ else
 fi
 
 
-cd addressbook-v1
+cd addressbook-
+git checkout jfrong-jenkin
 mvn package
 
-mvn -U deploy -s settings.xml
+# mvn -U deploy -s settings.xml
