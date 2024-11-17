@@ -12,7 +12,7 @@ else
 fi
 
 
-cd addressbook-
+cd addressbook-v1
 git checkout jfrong-jenkin
 mvn package
 
