@@ -60,7 +60,7 @@ pipeline {
             agent any
             steps {
                 script{
-                sshagent(['shh-agent_docker']) {
+                sshagent(['shh-agent-4']) {
                 withCredentials([usernamePassword(credentialsId: 'docker_login', passwordVariable: 'PASSWORD', usernameVariable: 'USER_NAME')]) 
                 echo 'Package the code'
                 echo "Deploying the app version ${params.APPVERSION}"
