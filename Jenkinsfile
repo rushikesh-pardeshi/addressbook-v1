@@ -46,7 +46,8 @@ pipeline {
             steps {
                 script {
                     sshagent(['ssh-agent']) {
-                        withCredentials([usernamePassword(credentialsId: 'docker_login', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                        withCredentials([usernamePassword(credentialsId: 'docker_login', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')])
+                          {
                             echo 'Packaging the code'
                             echo "Deploying the app version ${params.APPVERSION}"
                             echo "Docker login details: USERNAME=${USERNAME}, PASSWORD=<hidden>"
@@ -74,13 +75,19 @@ pipeline {
                 }
             }
             steps {
-                echo 'Deploying the code'
-                echo "Deploying the app version ${params.APPVERSION}"
-                echo "Deploying on ${params.Platform}"
-                sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} yun install docker -y"
-                sh "ssh ${DEPLOY_SERVER} sudo systemctl start docker"
-                sh "ssh ${DEPLOY_SERVER} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
-                sh "ssh ${DEPLOY_SERVER} sudo docker run -it -P ${IMAGE_NAME}"
+                script{ sshagent(['ssh-agent'])
+                       {withCredentials([usernamePassword(credentialsId: 'docker_login', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')])
+                        {
+                        echo "Deploying the app version ${params.APPVERSION}"
+                        echo "Runing ${IMAGE_NAME} on ${DEPLOY_SERVER}"
+                        sh "ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} yum install docker -y"
+                        sh "ssh ${DEPLOY_SERVER} sudo systemctl start docker"
+                        sh "ssh ${DEPLOY_SERVER} sudo docker login -u ${USERNAME} -p ${PASSWORD}"
+                        sh "ssh ${DEPLOY_SERVER} sudo docker run -it -P ${IMAGE_NAME}"
+                        echo "sucessfully ${IMAGE_NAME} runing ${DEPLOY_SERVER}"
+                        }
+                       }
+                }
             }
         }
     }
