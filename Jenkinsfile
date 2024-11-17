@@ -10,7 +10,8 @@ pipeline {
 
     }
     environment{
-        DEV_SERVER='ec2-user@172.31.8.125'
+        DEV_SERVER='ec2-user@172.31.1.139'
+        IMAGE_NAME='rushikeshpardeshi1507/project_image:$BUILD_NUMBER'
     }
     stages {
         stage('Compile') {
@@ -59,12 +60,16 @@ pipeline {
             agent any
             steps {
                 script{
-                sshagent(['ssh-agent-4']) {
+                sshagent(['shh-agent_docker']) {
+                withCredentials([usernamePassword(credentialsId: 'docker_login', passwordVariable: 'PASSWORD', usernameVariable: 'USER_NAME')]) 
                 echo 'Package the code'
                 echo "Deploying the app version ${params.APPVERSION}"
                 // scp for copy script from jenkin server to new ssh agent
                 sh "scp -o StrictHostKeyChecking=no server-script.sh ${DEV_SERVER}:/home/ec2-user"
-                sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER} 'bash /home/ec2-user/server-script.sh'"
+                // sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER} 'bash /home/ec2-user/server-script.sh'"
+                sh "ssh -o StrictHostKeyChecking=no ${DEV_SERVER} bash /home/ec2-user/server-script.sh ${IMAGE_NAME}"
+                sh "ssh ${DEV_SERVER} sudo docker login -u ${USER_NAME} -p ${PASSWORD}"
+                sh "ssh ${DEV_SERVER} sudo docker push ${IMAGE_NAME}"
             }
         }
             }
